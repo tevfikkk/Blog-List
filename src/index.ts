@@ -1,14 +1,11 @@
-import express, { Application, Request, Response } from 'express'
+import http from 'http'
 
+import app from './app'
 import { PORT } from './utils/config'
 import { info } from './utils/logger'
 
-const app: Application = express()
+const server = http.createServer(app)
 
-app.use('/', (req: Request, res: Response) => {
-  res.status(200).send({ data: 'as' })
-})
-
-app.listen(PORT, () => {
+server.listen(PORT as string, () => {
   info(`Sever is running on port ${PORT}`)
 })
