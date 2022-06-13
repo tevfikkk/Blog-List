@@ -11,8 +11,13 @@ const blogSchema = new mongoose.Schema(
       type: String,
       required: [true, 'Body is required']
     },
-    date: Date
+    date: Date,
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    }
   },
+
   {
     timestamps: true
   }
