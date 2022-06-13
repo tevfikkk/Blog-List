@@ -1,10 +1,12 @@
-import { NextFunction, Request, Response, Router as blogRouter } from 'express'
+import { NextFunction, Request, Response, Router } from 'express'
 
-import blogModel from '../models/blogModel'
+import Blog from '../models/blogModel'
+import type { blogType } from '../types/blog'
 
-blogRouter.get(
-  '/',
-  async (req: Request, res: Response, next: NextFunction) => {
-      
-  }
-)
+export const blogRouter: Router = Router()
+
+blogRouter.get('/', async (req: Request, res: Response) => {
+  Blog.find({}).then((blogs: blogType[]) => {
+    res.status(200).json({ data: blogs })
+  })
+})

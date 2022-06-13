@@ -3,6 +3,6 @@ export const info = (...params: any[]) => {
   console.log(...params)
 }
 
-export const error = (...params: any[]) => {
+export const errorMessage = (...params: any[]) => {
   console.error(...params)
 }

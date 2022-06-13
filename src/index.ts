@@ -7,5 +7,5 @@ import { info } from './utils/logger'
 const server = http.createServer(app)
 
 server.listen(PORT as string, () => {
-  info(`Sever is running on port ${PORT}`)
+  info(`Server is running on port ${PORT}`)
 })
