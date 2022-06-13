@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response, Router } from 'express'
 
 import Blog from '../models/blogModel'
+import { User } from '../models/userModel'
 import type { blogType } from '../types/blog'
 
 export const blogRouter: Router = Router()
@@ -38,22 +39,27 @@ blogRouter.post(
   async (req: Request, res: Response, next: NextFunction) => {
     const {
       title,
-      body
+      body,
+      userId
     }: {
       title: string
       body: string
+      userId: string
     } = req.body
 
-    await Blog.create({
+    const user = await User.findById(userId)
+
+    const newBlog = new Blog({
       title: title as string,
-      body: body as string
+      body: body as string,
+      user: user._id as string //! The user is saved in the blog
     })
-      .then((blog: blogType) => {
-        blog
-          ? res.status(201).json(blog)
-          : res.status(404).json({ message: 'Blog not created' })
-      })
-      .catch((err: Error) => next(err))
+
+    const savedBlog = await newBlog.save()
+    user.blogs = user.blogs.concat(savedBlog._id)
+    await user.save()
+
+    res.status(201).json(savedBlog)
   }
 )
 
