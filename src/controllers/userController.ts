@@ -47,5 +47,6 @@ userRouter.post('/', async (req: Request, res: Response) => {
 // Returns all users
 // Public route
 userRouter.get('/', async (req: Request, res: Response) => {
-  res.status(200).json(await User.find({}))
+  const users = await User.find({}).populate('blogs', { title: 1, body: 1 })
+  res.status(200).json(users)
 })

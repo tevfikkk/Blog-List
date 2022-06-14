@@ -10,9 +10,9 @@ export const blogRouter: Router = Router()
 // Returns all blogs
 // Public route
 blogRouter.get('/', async (req: Request, res: Response) => {
-  Blog.find({}).then((blogs: blogType[]) => {
-    res.status(200).json({ data: blogs })
-  })
+  const blogs = await Blog.find({}).populate('user', { username: 1, name: 1 })
+
+  res.status(200).json(blogs)
 })
 
 // GET /api/blogs/:id
