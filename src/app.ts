@@ -3,6 +3,7 @@ import express, { Application } from 'express'
 import mongoose from 'mongoose'
 
 import { blogRouter } from './controllers/blogController'
+import { loginRouter } from './controllers/login'
 import { userRouter } from './controllers/userController'
 import { MONGO_URI } from './utils/config'
 import { errorMessage, info } from './utils/logger'
@@ -31,6 +32,8 @@ app.use(requestLogger)
 
 app.use('/api/blogs', blogRouter)
 app.use('/api/users', userRouter)
+
+app.use('/api/login', loginRouter)
 
 app.use(unknownEndpoint)
 app.use(errorHandler)
