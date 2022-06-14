@@ -1,10 +1,22 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextFunction, Request, Response, Router } from 'express'
+import jwt from 'jsonwebtoken'
 
 import Blog from '../models/blogModel'
 import { User } from '../models/userModel'
 import type { blogType } from '../types/blog'
 
 export const blogRouter: Router = Router()
+
+//! Get token from header
+//! @param {Request} req
+const getTokenfrom = (req: Request): any => {
+  const authorization = req.get('authorization')
+  if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
+    return authorization.substring(7)
+  }
+  return null
+}
 
 // GET /api/blogs
 // Returns all blogs
@@ -34,34 +46,37 @@ blogRouter.get(
 // POST /api/blogs
 // Creates a new blog
 // Private route
-blogRouter.post(
-  '/',
-  async (req: Request, res: Response, next: NextFunction) => {
-    const {
-      title,
-      body,
-      userId
-    }: {
-      title: string
-      body: string
-      userId: string
-    } = req.body
+blogRouter.post('/', async (req: Request, res: Response) => {
+  const {
+    title,
+    body
+  }: {
+    title: string
+    body: string
+  } = req.body
 
-    const user = await User.findById(userId)
-
-    const newBlog = new Blog({
-      title: title as string,
-      body: body as string,
-      user: user._id as string //! The user is saved in the blog
-    })
-
-    const savedBlog = await newBlog.save()
-    user.blogs = user.blogs.concat(savedBlog._id)
-    await user.save()
-
-    res.status(201).json(savedBlog)
+  const token = getTokenfrom(req)
+  const decodedToken = jwt.verify(token, process.env.SECRET as string) as any
+  console.log(decodedToken)
+  if (!decodedToken.id) {
+    return res.status(401).json({ error: 'token missing or invalid' })
   }
-)
+  const user = await User.findById(decodedToken.id)
+
+  //const user = await User.findById(userId)
+
+  const newBlog = new Blog({
+    title: title as string,
+    body: body as string,
+    user: user._id as string //! The user is saved in the blog
+  })
+
+  const savedBlog = await newBlog.save()
+  user.blogs = user.blogs.concat(savedBlog._id)
+  await user.save()
+
+  res.status(201).json(savedBlog)
+})
 
 // DELETE /api/blogs/:id
 // Deletes a blog by id
